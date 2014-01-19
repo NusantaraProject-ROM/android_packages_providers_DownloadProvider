@@ -40,6 +40,7 @@ import android.provider.Downloads;
 import android.service.notification.StatusBarNotification;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.format.Formatter;
 import android.util.ArrayMap;
 import android.util.IntArray;
 import android.util.Log;
@@ -285,6 +286,7 @@ public class DownloadNotifier {
             // Calculate and show progress
             String remainingText = null;
             String percentText = null;
+            String speedText = null;
             if (type == TYPE_ACTIVE) {
                 long current = 0;
                 long total = 0;
@@ -310,6 +312,8 @@ public class DownloadNotifier {
                             NumberFormat.getPercentInstance().format((double) current / total);
 
                     if (speed > 0) {
+                        speedText = res.getString(R.string.download_speed,
+                                Formatter.formatFileSize(mContext, speed));
                         final long remainingMillis = ((total - current) * 1000) / speed;
                         remainingText = res.getString(R.string.download_remaining,
                                 DateUtils.formatDuration(remainingMillis));
@@ -322,6 +326,44 @@ public class DownloadNotifier {
                 }
             }
 
+            int combo = 0;
+            if (!TextUtils.isEmpty(percentText)) {
+                combo += 1;
+            }
+            if (!TextUtils.isEmpty(speedText)) {
+                combo += 2;
+            }
+            if (!TextUtils.isEmpty(remainingText)) {
+                combo += 4;
+            }
+            String subtext;
+            switch (combo) {
+                case 1:
+                    subtext = percentText;
+                    break;
+                case 2:
+                    subtext = speedText;
+                    break;
+                case 3:
+                    subtext = speedText + ", " + percentText;
+                    break;
+                case 4:
+                    subtext = remainingText;
+                    break;
+                case 5:
+                    subtext = remainingText + ", " + percentText;
+                    break;
+                case 6:
+                    subtext = speedText + ", " + remainingText;
+                    break;
+                case 7:
+                    subtext = speedText + ", " + remainingText + ", " + percentText;
+                    break;
+                default:
+                    subtext = "";
+                    break;
+            }
+
             // Build titles and description
             final Notification notif;
             if (cluster.size() == 1) {
@@ -332,11 +374,8 @@ public class DownloadNotifier {
                     final String description = cursor.getString(UpdateQuery.DESCRIPTION);
                     if (!TextUtils.isEmpty(description)) {
                         builder.setContentText(description);
-                    } else {
-                        builder.setContentText(remainingText);
                     }
-                    builder.setContentInfo(percentText);
-
+                    builder.setSubText(subtext);
                 } else if (type == TYPE_WAITING) {
                     builder.setContentText(
                             res.getString(R.string.notification_need_wifi_for_size));
@@ -364,10 +403,7 @@ public class DownloadNotifier {
                 if (type == TYPE_ACTIVE) {
                     builder.setContentTitle(res.getQuantityString(
                             R.plurals.notif_summary_active, cluster.size(), cluster.size()));
-                    builder.setContentText(remainingText);
-                    builder.setContentInfo(percentText);
-                    inboxStyle.setSummaryText(remainingText);
-
+                    builder.setSubText(subtext);
                 } else if (type == TYPE_WAITING) {
                     builder.setContentTitle(res.getQuantityString(
                             R.plurals.notif_summary_waiting, cluster.size(), cluster.size()));

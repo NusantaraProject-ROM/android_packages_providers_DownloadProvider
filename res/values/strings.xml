@@ -106,6 +106,9 @@
     and modify all downloads initiated by any app on the system.</string>
 
 
+    <!-- Transfer speed for current download/s. -->
+    <string name="download_speed"><xliff:g id="duration">%s</xliff:g>/s</string>
+
     <!-- This is the title that is used when displaying the notification
     for a download that doesn't have a title associated with it. -->
     <string name="download_unknown_title">&lt;Untitled&gt;</string>
