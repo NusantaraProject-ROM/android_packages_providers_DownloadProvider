@@ -298,7 +298,7 @@ public class DownloadNotifier {
                             com.android.internal.R.drawable.ic_media_play,
                             res.getString(R.string.button_resume_download),
                             PendingIntent.getBroadcast(mContext,
-                                    0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+                                    0, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
                 } else {
                     // Add a Pause action
                     final Intent pauseIntent = new Intent(Constants.ACTION_PAUSE,
@@ -310,7 +310,7 @@ public class DownloadNotifier {
                             com.android.internal.R.drawable.ic_media_pause,
                             res.getString(R.string.button_pause_download),
                             PendingIntent.getBroadcast(mContext,
-                                    0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+                                    0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
                 }
 
             } else if (type == TYPE_COMPLETE) {
